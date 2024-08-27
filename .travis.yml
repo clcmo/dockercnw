@@ -1,0 +1,17 @@
+# Arquivo yml que configura a imagem e o preparo para a construção (build) de nosso amigo docker.
+# Aluno: caso deseje usar outra branch para seu desenvolvimento, atualize na linha 8.
+services:
+  - docker
+
+branches:
+  only:
+    - main
+
+before_install:
+  - docker build -t dockercnw .
+  - docker run -d -p 127.0.0.1:8000:8000 dockercnw
+
+script:
+  - docker ps | grep dockercnw
+  - curl --fail localhost:8000
+  - curl --fail -I localhost:8000

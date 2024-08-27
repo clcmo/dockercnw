@@ -1,0 +1,44 @@
+name: Build & push
+
+on:
+  push:
+    branches: [ main ]
+
+  workflow_dispatch:
+
+defaults:
+  run:
+    working-directory: ./
+
+jobs:
+  push-app-image:
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Logando, de maneira privada
+        uses: docker/login-action@v2
+        with:
+          registry: my.private.registry.com
+          username: ${{ secrets.MY_REG_USER }}
+          password: ${{ secrets.MY_REG_PASSWORD }}
+
+      - name: Configurando QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Configurando Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Construindo a imagem
+        uses: docker/build-push-action@v4
+        with:
+          push: true
+          context: .
+          file: ./
+          platforms: linux/amd64
+          tags: camileite/dockercnw:latest
+          secrets: |
+            "secret_1=${{ secrets.MY_SECRET_1 }}"
+            "secret_2=${{ secrets.MY_SECRET_2 }}"
